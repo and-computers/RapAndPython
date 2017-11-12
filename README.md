@@ -16,6 +16,6 @@ Teaching the basics of python and programming using text analysis of lyrics
 
 6. Common and useful string methods.
 
-7. Regular Expression (Regex)
+7. Regular Expressions (Regex)
 
 7. ML Type Things (?)
