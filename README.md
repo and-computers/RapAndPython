@@ -1,7 +1,9 @@
 # RapAndPython
 Teaching the basics of python and programming using text analysis of lyrics
 
-Current truncated example output (still need to look into what this means):
+Current truncated example output for some outkast songs (still need to look into what this means):
+
+![outkast gif](https://media.giphy.com/media/OevJJjSjVT02c/giphy.gif)
 ```
 D.E.E.P..txt has a reading level of: 
 30.61
