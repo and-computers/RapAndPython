@@ -1,9 +1,23 @@
 # RapAndPython
 Teaching the basics of python and programming using text analysis of lyrics
 
-Current truncated example output for some outkast songs (still need to look into what this means):
+
+Current truncated example output for some outkast songs:
+
+
+Key:
+* 90-100 : Very Easy 
+* 80-89 : Easy 
+* 70-79 : Fairly Easy 
+* 60-69 : Standard 
+* 50-59 : Fairly Difficult 
+* 30-49 : Difficult 
+* 0-29 : Very Confusing
+* Negative numbers: No idea what this means.
 
 ![outkast gif](https://media.giphy.com/media/OevJJjSjVT02c/giphy.gif)
+
+
 ```
 D.E.E.P..txt has a reading level of: 
 30.61
