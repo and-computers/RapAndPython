@@ -9,7 +9,7 @@ import requests
 import os
 # BeautifulSoupp is a library made to allow developers to parse through the contents of a webpage
 from bs4 import BeautifulSoup
-url = "https://www.azlyrics.com/o/outkast.html"
+url = "https://www.azlyrics.com/t/tylerthecreator.html"
 
 
 # act like a mac when requesting url
@@ -33,15 +33,24 @@ for song_link in soup.find_all("a", href=True):
 	    print lyric_url
 	    response = requests.get(lyric_url, headers=headers)
 	    new_soup = BeautifulSoup(response.text,"lxml")
-	    filename = song_link.text.replace(' ','_').replace("'",'')
+	    filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
 	    filename += ".txt"
 	    filename = "scraped_data" + os.sep + filename
 	    print filename
 	    f = open(filename,"w+")
 	    for lyric in new_soup.find_all("div",{"class":None}):
 	    	print lyric.text
-	    	f = open(filename,"a")
-	    	f.write(lyric.text)
+	    	try:
+	    		f = open(filename,"a")
+	    	except IOError:
+	    		print('IOError could not write filename: {}'.format(filename))
+	    		continue
+	    	try:
+	    		f.write(lyric.text.encode('utf-8'))
+	    	except UnicodeError:
+	    		print('UnicodeError, Skipping: {}'.format(filename))
+	    		f.close()
+	    		continue
 	    f.close()
 
 
