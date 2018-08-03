@@ -1,0 +1,122 @@
+
+album: "Sir Lucious Left Foot: The Son of Chico Dusty" (2010)
+Feel Me (Intro)
+Daddy Fat Sax
+Turns Me On
+Follow Us
+Shutterbug
+General Patton
+Tangerine
+You Ain't No DJ
+Hustle Blood
+Be Still
+Fo Yo Sorrows
+Night Night
+Shine Blockas
+The Train Pt. 2 (Sir Lucious Left Foot Saves The Day)
+Back Up Plan
+Theme Song[Deluxe Edition Bonus Track]
+Shine Blockas (Remix)[Deluxe Edition Bonus Track]
+album: "Vicious Lies And Dangerous Rumors" (2012)
+Ascending
+The Thickets
+Apple Of My Eye
+Objectum Sexuality
+In The A
+She Hates Me
+CPU
+Thom Pettie
+Mama Told Me
+Lines
+Shoes For Running
+Raspberries
+Tremendous Damage
+Descending
+Higher Res[Deluxe Edition Bonus Track]
+Gossip[Deluxe Edition Bonus Track]
+She Said OK[Deluxe Edition Bonus Track]
+album: "Boomiverse" (2017)
+Da Next Day
+Kill Jill
+Mic Jack
+In The South
+Order Of Operations
+All Night
+Get Wit It
+Overthunk
+Chocolate
+Made Men
+Freakanomics
+Follow Deez
+other songs:
+Lookin' 4 Ya
+Royal Flush
+Sumthin's Gotta Give
+
+<!--
+function showAlbum() {
+  document.getElementById("listAlbum").innerHTML = save;
+  return false;
+}
+function showSong() {
+  document.getElementById("listAlbum").innerHTML = res;
+  return false;
+}
+var songlist = [
+{s:"All Night", h:"../lyrics/bigboi/allnight.html", c:"", a:""},
+{s:"Apple Of My Eye", h:"../lyrics/bigboi/appleofmyeye.html", c:"", a:""},
+{s:"Ascending", h:"../lyrics/bigboi/ascending.html", c:"", a:""},
+{s:"Back Up Plan", h:"../lyrics/bigboi/backupplan.html", c:"", a:""},
+{s:"Be Still", h:"../lyrics/bigboi/bestill.html", c:"", a:""},
+{s:"Chocolate", h:"../lyrics/bigboi/chocolate.html", c:"", a:""},
+{s:"CPU", h:"../lyrics/bigboi/cpu.html", c:"", a:""},
+{s:"Da Next Day", h:"../lyrics/bigboi/danextday.html", c:"", a:""},
+{s:"Daddy Fat Sax", h:"../lyrics/bigboi/daddyfatsax.html", c:"", a:""},
+{s:"Descending", h:"../lyrics/bigboi/descending.html", c:"", a:""},
+{s:"Feel Me (Intro)", h:"../lyrics/bigboi/feelmeintro.html", c:"", a:""},
+{s:"Fo Yo Sorrows", h:"../lyrics/bigboi/foyosorrows.html", c:"", a:""},
+{s:"Follow Deez", h:"../lyrics/bigboi/followdeez.html", c:"", a:""},
+{s:"Follow Us", h:"../lyrics/bigboi/followus.html", c:"", a:""},
+{s:"Freakanomics", h:"../lyrics/bigboi/freakanomics.html", c:"", a:""},
+{s:"General Patton", h:"../lyrics/bigboi/generalpatton.html", c:"", a:""},
+{s:"Get Wit It", h:"../lyrics/bigboi/getwitit.html", c:"", a:""},
+{s:"Gossip", h:"../lyrics/bigboi/gossip.html", c:"", a:""},
+{s:"Higher Res", h:"../lyrics/bigboi/higherres.html", c:"", a:""},
+{s:"Hustle Blood", h:"../lyrics/bigboi/hustleblood.html", c:"", a:""},
+{s:"In The A", h:"../lyrics/bigboi/inthea.html", c:"", a:""},
+{s:"In The South", h:"../lyrics/bigboi/inthesouth.html", c:"", a:""},
+{s:"Kill Jill", h:"../lyrics/bigboi/killjill.html", c:"", a:""},
+{s:"Lines", h:"../lyrics/bigboi/lines.html", c:"", a:""},
+{s:"Lookin' 4 Ya", h:"../lyrics/bigboi/lookin4ya.html", c:"", a:""},
+{s:"Made Men", h:"../lyrics/bigboi/mademen.html", c:"", a:""},
+{s:"Mama Told Me", h:"../lyrics/bigboi/mamatoldme.html", c:"", a:""},
+{s:"Mic Jack", h:"../lyrics/bigboi/micjack.html", c:"", a:""},
+{s:"Night Night", h:"../lyrics/bigboi/nightnight.html", c:"", a:""},
+{s:"Objectum Sexuality", h:"../lyrics/bigboi/objectumsexuality.html", c:"", a:""},
+{s:"Order Of Operations", h:"../lyrics/bigboi/orderofoperations.html", c:"", a:""},
+{s:"Overthunk", h:"../lyrics/bigboi/overthunk.html", c:"", a:""},
+{s:"Raspberries", h:"../lyrics/bigboi/raspberries.html", c:"", a:""},
+{s:"Royal Flush", h:"../lyrics/bigboi/royalflush.html", c:"", a:""},
+{s:"She Hates Me", h:"../lyrics/bigboi/shehatesme.html", c:"", a:""},
+{s:"She Said OK", h:"../lyrics/bigboi/shesaidok.html", c:"", a:""},
+{s:"Shine Blockas", h:"../lyrics/bigboi/shineblockas.html", c:"", a:""},
+{s:"Shine Blockas (Remix)", h:"../lyrics/bigboi/shineblockasremix.html", c:"", a:""},
+{s:"Shoes For Running", h:"../lyrics/bigboi/shoesforrunning.html", c:"", a:""},
+{s:"Shutterbug", h:"../lyrics/bigboi/shutterbug.html", c:"", a:""},
+{s:"Sumthin's Gotta Give", h:"../lyrics/bigboi/sumthinsgottagive.html", c:"", a:""},
+{s:"Tangerine", h:"../lyrics/bigboi/tangerine.html", c:"", a:""},
+{s:"The Thickets", h:"../lyrics/bigboi/thethickets.html", c:"", a:""},
+{s:"The Train Pt. 2 (Sir Lucious Left Foot Saves The Day)", h:"../lyrics/bigboi/thetrainpt2sirluciousleftfootsavestheday.html", c:"", a:""},
+{s:"Theme Song", h:"../lyrics/bigboi/themesong.html", c:"", a:""},
+{s:"Thom Pettie", h:"../lyrics/bigboi/thompettie.html", c:"", a:""},
+{s:"Tremendous Damage", h:"../lyrics/bigboi/tremendousdamage.html", c:"", a:""},
+{s:"Turns Me On", h:"../lyrics/bigboi/turnsmeon.html", c:"", a:""},
+{s:"You Ain't No DJ", h:"../lyrics/bigboi/youaintnodj.html", c:"", a:""}];
+var res = '<br>';
+var i = 0;
+for (i=0; i<songlist.length; i++) {
+  res += '<a href="'+songlist[i].h+'" target="_blank">'+songlist[i].s+'</a>'+songlist[i].c+(songlist[i].a=="" ? '' : ' <span class="comment">["'+songlist[i].a+'"]</span>')+'<br>';
+}
+var save = document.getElementById("listAlbum").innerHTML;
+//-->
+
