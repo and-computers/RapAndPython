@@ -8,6 +8,7 @@ import requests
 # os is a library for doing operating system things, like looking through file directories
 import os
 import time
+import logger
 # BeautifulSoupp is a library made to allow developers to parse through the contents of a webpage
 from bs4 import BeautifulSoup
 url = "https://www.azlyrics.com/t/tylerthecreator.html"
@@ -40,10 +41,12 @@ for song_link in soup.find_all("a", href=True):
 	    filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
 	    filename += ".txt"
 	    filename = "scraped_data" + os.sep + filename
-	    print filename
+	    print('Filename: {}'.format(filename))
 	    f = open(filename,"w+")
+
+	    # loop through the no clas divs. they contain the lyrics
 	    for lyric in new_soup.find_all("div",{"class":None}):
-	    	print lyric.text
+	    	print('Lyrics Text: {}'.format(lyric.text))
 	    	try:
 	    		f = open(filename,"a")
 	    	except IOError:
@@ -55,6 +58,17 @@ for song_link in soup.find_all("a", href=True):
 	    		print('UnicodeError, Skipping: {}'.format(filename))
 	    		f.close()
 	    		continue
+
+	    # the song panel div has the album name and the year
+	    for song_panel_div in new_soup.find_all("div",{"class":"panel songlist-panel noprint"}):
+	    	try:
+		    	f.write('ALBUM INFO')
+		    	f.write(song_panel_div.text.encode('utf-8'))
+		    except UnicodeError:
+		    	print('UnicodeError, Skipping')
+		    	f.close()
+		    	continue
+
 	    f.close()
 
 
