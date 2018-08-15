@@ -8,10 +8,30 @@ import requests
 # os is a library for doing operating system things, like looking through file directories
 import os
 import time
-import logger
+import logging
 # BeautifulSoupp is a library made to allow developers to parse through the contents of a webpage
 from bs4 import BeautifulSoup
-url = "https://www.azlyrics.com/t/tylerthecreator.html"
+
+
+logger = logging.getLogger('rap_webscraper.{}'.format(__name__))
+
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('rap_webscrape.log')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
+
+
+url = "https://www.azlyrics.com/j/jcole.html"
 
 
 # act like a mac when requesting url
@@ -26,49 +46,60 @@ soup = BeautifulSoup(r.text, "lxml")
 
 # get the songs and links to the lyrics
 lyrics_map = {}
+artists_file_directory = url.split('/')[-1].replace('.html','')
 for song_link in soup.find_all("a", href=True):
-    if len(song_link.text) == 0:
-    	continue
-    lyrics_map[song_link.text] = song_link['href']
-    lyric_url = song_link['href']
-    if ".." in lyric_url:
-	    lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
-	    print lyric_url
-	    # sleep for some time (in seconds) so you arent banned from sites..
-	    time.sleep(5)
-	    response = requests.get(lyric_url, headers=headers)
-	    new_soup = BeautifulSoup(response.text,"lxml")
-	    filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
-	    filename += ".txt"
-	    filename = "scraped_data" + os.sep + filename
-	    print('Filename: {}'.format(filename))
-	    f = open(filename,"w+")
+	if len(song_link.text) == 0:
+		continue
+	lyrics_map[song_link.text] = song_link['href']
+	lyric_url = song_link['href']
+	if ".." in lyric_url:
+		lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
+		logger.info('Requesting: {}'.format(lyric_url))
+		# sleep for some time (in seconds) so you arent banned from sites..
+		time.sleep(0.5)
+		response = requests.get(lyric_url, headers=headers)
+		new_soup = BeautifulSoup(response.text,"lxml")
+		filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
+		filename += ".txt"
+		# filename = "scraped_data" + os.sep + filename
+		filename = os.path.join("scraped_data",artists_file_directory,filename)
+		logger.info('Will Write to: {}'.format(filename))
+		
+		# https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
+		if not os.path.exists(os.path.dirname(filename)):
+			try:
+				os.makedirs(os.path.dirname(filename))
+			except OSError as exc: # Guard against race condition
+				if exc.errno != errno.EEXIST:
+					raise
 
-	    # loop through the no clas divs. they contain the lyrics
-	    for lyric in new_soup.find_all("div",{"class":None}):
-	    	print('Lyrics Text: {}'.format(lyric.text))
-	    	try:
-	    		f = open(filename,"a")
-	    	except IOError:
-	    		print('IOError could not write filename: {}'.format(filename))
-	    		continue
-	    	try:
-	    		f.write(lyric.text.encode('utf-8'))
-	    	except UnicodeError:
-	    		print('UnicodeError, Skipping: {}'.format(filename))
-	    		f.close()
-	    		continue
+		f = open(filename,"w+")
 
-	    # the song panel div has the album name and the year
-	    for song_panel_div in new_soup.find_all("div",{"class":"panel songlist-panel noprint"}):
-	    	try:
-		    	f.write('ALBUM INFO')
-		    	f.write(song_panel_div.text.encode('utf-8'))
-		    except UnicodeError:
-		    	print('UnicodeError, Skipping')
-		    	f.close()
-		    	continue
+		# loop through the no clas divs. they contain the lyrics
+		for lyric in new_soup.find_all("div",{"class":None}):
+			logger.debug('Lyrics Text: {}'.format(lyric.text.encode('utf-8')))
+			try:
+				f = open(filename,"a")
+			except IOError:
+				logger.warning('IOError could not write filename: {}'.format(filename))
+				continue
+			try:
+				f.write(lyric.text.encode('utf-8'))
+			except UnicodeError:
+				logger.warning('UnicodeError, Skipping: {}'.format(filename))
+				f.close()
+				continue
 
-	    f.close()
+		# the song panel div has the album name and the year
+		for song_panel_div in new_soup.find_all("div",{"class":"panel songlist-panel noprint"}):
+			try:
+				f.write('ALBUM INFO')
+				f.write(song_panel_div.text.encode('utf-8'))
+			except UnicodeError:
+				logger.warning('UnicodeError, Skipping')
+				f.close()
+				continue
+
+		f.close()
 
 
