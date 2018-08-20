@@ -45,9 +45,19 @@ def make_reference_dict(artist_dir,regex):
 
 					yr = re.findall(r'\nALBUM INFO\r?\n\w{0,}?:\s".{0,}"\s\(\d+\)',alltxt)
 					try:
-						yr = int(re.findall(r'\d+',yr[0])[0])
+						yr = int(re.findall(r'\d+',yr[0])[-1])
+						if yr < 1900 or yr > 2020:
+							logger.warning('Year for {art}/{f} was {yr} replacing with NaN'.format(
+								art=artist_dir,
+								f=fname,
+								yr=yr)
+							)
+							yr = np.nan
 					except IndexError:
-						logger.warning('Was unable to find year in {}'.format(fname))
+						logger.warning('Was unable to find year in {art}/{f}'.format(
+							art=artist_dir,
+							f=fname)
+						)
 						yr = np.nan
 					songs_number_ref[fname] = (found_ref,num_refs,yr)
 
@@ -127,7 +137,7 @@ def simple_bar_from_df(df,graph_title,x_data,y_data,x_title=None,y_title=None):
 #regex expressions
 homo_regex= r'f[a]*g\w{0,}'
 gay_regex = r'g[a]*y\w{0,}'
-bitch_regex = r'b[i]*tch\w{0,}'
+bitch_regex = r'b[i]*tch\w{0,}|\sho[es]*\s'
 rape_regex = r'rap[ie]\w{0,}'
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=homo_regex)
@@ -139,6 +149,40 @@ simple_bar_from_df(
 	y_data='number of references',
 	x_title='Year',
 	y_title='# of Homophobic References'
+	)
+
+
+songs_number_ref = make_reference_dict('drake',regex=bitch_regex)
+ref_df,grouped_df = create_references_df(songs_number_ref)
+simple_bar_from_df(
+	grouped_df,
+	graph_title='Drakes Mysogony: An Explorations',
+	x_data='year',
+	y_data='avg ref',
+	x_title='Year',
+	y_title='Average # of Bitch or Ho[e] References'
+	)
+
+songs_number_ref = make_reference_dict('jcole',regex=bitch_regex)
+ref_df,grouped_df = create_references_df(songs_number_ref)
+simple_bar_from_df(
+	grouped_df,
+	graph_title='J. Cole\'s Mysogony: An Explorations',
+	x_data='year',
+	y_data='avg ref',
+	x_title='Year',
+	y_title='Average # of Bitch or Ho[e] References'
+	)
+
+songs_number_ref = make_reference_dict('tylerthecreator',regex=bitch_regex)
+ref_df,grouped_df = create_references_df(songs_number_ref)
+simple_bar_from_df(
+	grouped_df,
+	graph_title='Tyler\'s Mysogony: An Explorations',
+	x_data='year',
+	y_data='avg ref',
+	x_title='Year',
+	y_title='Average # of Bitch or Ho[e] References'
 	)
 
 
