@@ -36,14 +36,14 @@ def make_reference_dict(artist_dir,regex):
 
 	songs_number_ref = {}
 	for root,dirs,fnameslist in os.walk("scraped_data"):
-		if 'tylerthecreator' in root:
+		if artist_dir in root:
 			for fname in fnameslist:
 				with open(os.path.join(root,fname)) as lyrics:
 					alltxt = lyrics.read()
 					found_ref = re.findall(regex,str(alltxt))
 					num_refs = len(found_ref)
 
-					yr = re.findall(r'\nALBUM INFO\r?\nalbum:\s"[\w{0,}\s{0,}]{0,}"\s\(\d+\)',alltxt)
+					yr = re.findall(r'\nALBUM INFO\r?\n\w{0,}?:\s".{0,}"\s\(\d+\)',alltxt)
 					try:
 						yr = int(re.findall(r'\d+',yr[0])[0])
 					except IndexError:
@@ -91,6 +91,39 @@ def create_references_df(dictionary_of_3_tuples):
 
 	return raw_df,cumulative_df
 
+def simple_bar_from_df(df,graph_title,x_data,y_data,x_title=None,y_title=None):
+	"""
+	Function to generate a simple bar graph from a dataframe
+	"""
+
+	trace = go.Bar(x=df[x_data],y=df[y_data])
+
+	layout = go.Layout(
+	    title=graph_title,
+	    xaxis=dict(
+	    	# make the title the title if it exists, otherwise use x_data label
+	        title=x_title if x_title else x_data,
+	        titlefont=dict(
+	            family='Courier New, monospace',
+	            size=18,
+	            color='#7f7f7f'
+	        )
+	    ),
+	    yaxis=dict(
+	        title=y_title if y_title else y_data,
+	        titlefont=dict(
+	            family='Courier New, monospace',
+	            size=18,
+	            color='#7f7f7f'
+	        )
+	    )
+	)
+	fig = go.Figure(data=[trace], layout=layout)
+	pltly.plot(fig,filename=graph_title+'.html')
+
+	return
+
+
 #regex expressions
 homo_regex= r'f[a]*g\w{0,}'
 gay_regex = r'g[a]*y\w{0,}'
@@ -99,38 +132,14 @@ rape_regex = r'rap[ie]\w{0,}'
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=homo_regex)
 ref_df,grouped_df = create_references_df(songs_number_ref)
-logger.debug(ref_df)
-logger.info(grouped_df)
-
-
-
-
-
-
-traceHomophobe = go.Bar(x=grouped_df['year'],y=grouped_df['number of references'],
-	name='Homophobic References'
+simple_bar_from_df(
+	grouped_df,
+	graph_title='Tyler The Creator and His Slurs Over The Years',
+	x_data='year',
+	y_data='number of references',
+	x_title='Year',
+	y_title='# of Homophobic References'
 	)
 
 
 
-layout = go.Layout(
-    title='Tyler The Creator and His Slurs Over The Years',
-    xaxis=dict(
-        title='Year',
-        titlefont=dict(
-            family='Courier New, monospace',
-            size=18,
-            color='#7f7f7f'
-        )
-    ),
-    yaxis=dict(
-        title='Homophobic References',
-        titlefont=dict(
-            family='Courier New, monospace',
-            size=18,
-            color='#7f7f7f'
-        )
-    )
-)
-fig = go.Figure(data=[traceHomophobe], layout=layout)
-pltly.plot(fig)
