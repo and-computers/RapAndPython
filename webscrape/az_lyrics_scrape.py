@@ -56,10 +56,8 @@ for song_link in soup.find_all("a", href=True):
 	if ".." in lyric_url:
 		lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
 
-		# sleep for some time (in seconds) so you arent banned from sites..
 		filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
 		filename += ".txt"
-		# filename = "scraped_data" + os.sep + filename
 		filename = os.path.join("scraped_data",artists_file_directory,filename)
 		filename = filename.encode('utf-8')
 
@@ -70,6 +68,7 @@ for song_link in soup.find_all("a", href=True):
 				continue
 			continue
 		logger.info('Requesting: {}'.format(lyric_url))
+		# sleep for some time (in seconds) so you arent banned from sites..
 		time.sleep(SLEEP_TIME)
 		response = requests.get(lyric_url, headers=headers)
 		new_soup = BeautifulSoup(response.text,"lxml")
