@@ -30,6 +30,7 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
+SLEEP_TIME = 20.
 
 url = "https://www.azlyrics.com/j/jcole.html"
 
@@ -54,15 +55,24 @@ for song_link in soup.find_all("a", href=True):
 	lyric_url = song_link['href']
 	if ".." in lyric_url:
 		lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
-		logger.info('Requesting: {}'.format(lyric_url))
+
 		# sleep for some time (in seconds) so you arent banned from sites..
-		time.sleep(0.5)
-		response = requests.get(lyric_url, headers=headers)
-		new_soup = BeautifulSoup(response.text,"lxml")
 		filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
 		filename += ".txt"
 		# filename = "scraped_data" + os.sep + filename
 		filename = os.path.join("scraped_data",artists_file_directory,filename)
+
+		if os.path.exists(filename):
+			try:
+				logger.info('File {} already exists, skipping web request'.format(filename.encode('utf-8')))
+			except UnicodeEncodeError:
+				continue
+			continue
+		logger.info('Requesting: {}'.format(lyric_url))
+		time.sleep(SLEEP_TIME)
+		response = requests.get(lyric_url, headers=headers)
+		new_soup = BeautifulSoup(response.text,"lxml")
+
 		logger.info('Will Write to: {}'.format(filename))
 		
 		# https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
