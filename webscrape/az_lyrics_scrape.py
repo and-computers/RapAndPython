@@ -61,6 +61,7 @@ for song_link in soup.find_all("a", href=True):
 		filename += ".txt"
 		# filename = "scraped_data" + os.sep + filename
 		filename = os.path.join("scraped_data",artists_file_directory,filename)
+		filename = filename.encode('utf-8')
 
 		if os.path.exists(filename):
 			try:
@@ -87,7 +88,6 @@ for song_link in soup.find_all("a", href=True):
 
 		# loop through the no clas divs. they contain the lyrics
 		for lyric in new_soup.find_all("div",{"class":None}):
-			logger.debug('Lyrics Text: {}'.format(lyric.text.encode('utf-8')))
 			try:
 				f = open(filename,"a")
 			except IOError:
