@@ -26,6 +26,10 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
+"""
+Known Issues: featured verses are counted same way
+"""
+
 
 def make_reference_dict(artist_dir,regex):
 	"""
@@ -134,6 +138,43 @@ def simple_bar_from_df(df,graph_title,x_data,y_data,x_title=None,y_title=None):
 	return
 
 
+def comparative_bar_from_df(df_d,graph_title,x_data,y_data,x_title=None,y_title=None):
+	"""
+	Function to generate a grouped bar graph from a dictionary of dataframes
+	"""
+
+	traces = []
+	for name,df in df_d.items():
+		trace = go.Bar(x=df[x_data],y=df[y_data],name=name)
+		traces.append(trace)
+
+	layout = go.Layout(
+	    title=graph_title,
+	    barmode='group',
+	    xaxis=dict(
+	    	# make the title the title if it exists, otherwise use x_data label
+	        title=x_title if x_title else x_data,
+	        titlefont=dict(
+	            family='Courier New, monospace',
+	            size=18,
+	            color='#7f7f7f'
+	        )
+	    ),
+	    yaxis=dict(
+	        title=y_title if y_title else y_data,
+	        titlefont=dict(
+	            family='Courier New, monospace',
+	            size=18,
+	            color='#7f7f7f'
+	        )
+	    )
+	)
+	fig = go.Figure(data=traces, layout=layout)
+	pltly.plot(fig,filename=graph_title+'.html')
+
+	return
+
+
 #regex expressions
 homo_regex= r'f[a]*g\w{0,}'
 gay_regex = r'g[a]*y\w{0,}'
@@ -141,9 +182,9 @@ bitch_regex = r'b[i]*tch\w{0,}|\sho[es]*\s'
 rape_regex = r'rap[ie]\w{0,}'
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=homo_regex)
-ref_df,grouped_df = create_references_df(songs_number_ref)
+ref_df,ttc_homo_grouped_df = create_references_df(songs_number_ref)
 simple_bar_from_df(
-	grouped_df,
+	ttc_homo_grouped_df,
 	graph_title='Tyler The Creator and His Slurs Over The Years',
 	x_data='year',
 	y_data='number of references',
@@ -152,22 +193,25 @@ simple_bar_from_df(
 	)
 
 
+
 songs_number_ref = make_reference_dict('drake',regex=bitch_regex)
-ref_df,grouped_df = create_references_df(songs_number_ref)
+ref_df,drake_grouped_df = create_references_df(songs_number_ref)
 simple_bar_from_df(
-	grouped_df,
-	graph_title='Drakes Mysogony: An Explorations',
+	drake_grouped_df,
+	graph_title='Drakes Misogony: An Explorations',
 	x_data='year',
 	y_data='avg ref',
 	x_title='Year',
 	y_title='Average # of Bitch or Ho[e] References'
 	)
 
+
+
 songs_number_ref = make_reference_dict('jcole',regex=bitch_regex)
-ref_df,grouped_df = create_references_df(songs_number_ref)
+ref_df,cole_grouped_df = create_references_df(songs_number_ref)
 simple_bar_from_df(
-	grouped_df,
-	graph_title='J. Cole\'s Mysogony: An Explorations',
+	cole_grouped_df,
+	graph_title='J. Cole\'s Misogony: An Explorations',
 	x_data='year',
 	y_data='avg ref',
 	x_title='Year',
@@ -175,14 +219,28 @@ simple_bar_from_df(
 	)
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=bitch_regex)
-ref_df,grouped_df = create_references_df(songs_number_ref)
+ref_df,ttc_grouped_df = create_references_df(songs_number_ref)
 simple_bar_from_df(
-	grouped_df,
-	graph_title='Tyler\'s Mysogony: An Explorations',
+	ttc_grouped_df,
+	graph_title='Tyler\'s Misogony: An Explorations',
 	x_data='year',
 	y_data='avg ref',
 	x_title='Year',
 	y_title='Average # of Bitch or Ho[e] References'
+	)
+
+comp_dfs = {}
+comp_dfs['Tyler The Creator'] = ttc_grouped_df
+comp_dfs['J. Cole'] = cole_grouped_df
+comp_dfs['Drake'] = drake_grouped_df
+
+comparative_bar_from_df(
+	comp_dfs,
+	graph_title='Bitches & Hoes',
+	x_data='year',
+	y_data='avg ref',
+	x_title='Year',
+	y_title='Bitch/Hoe References per Song'
 	)
 
 
