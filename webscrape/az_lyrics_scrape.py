@@ -9,8 +9,11 @@ import requests
 import os
 import time
 import logging
+import random
+
 # BeautifulSoupp is a library made to allow developers to parse through the contents of a webpage
 from bs4 import BeautifulSoup
+
 
 
 logger = logging.getLogger('rap_webscraper.{}'.format(__name__))
@@ -30,9 +33,10 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-SLEEP_TIME = 20.
+SLEEP_TIME = 19.0
+NOISE = (0.0,4.0)
 
-url = "https://www.azlyrics.com/j/jcole.html"
+url = "https://www.azlyrics.com/b/bigpun.html"
 
 
 # act like a mac when requesting url
@@ -68,8 +72,11 @@ for song_link in soup.find_all("a", href=True):
 				continue
 			continue
 		logger.info('Requesting: {}'.format(lyric_url))
-		# sleep for some time (in seconds) so you arent banned from sites..
-		time.sleep(SLEEP_TIME)
+		"""
+		sleep for some time (in seconds) so you arent banned from sites..
+		add some random noise to the sleep so it don't look like a robot
+		"""
+		time.sleep(SLEEP_TIME+random.uniform(NOISE[0],NOISE[1]))
 		response = requests.get(lyric_url, headers=headers)
 		new_soup = BeautifulSoup(response.text,"lxml")
 
