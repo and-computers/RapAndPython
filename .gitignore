@@ -1,2 +1,6 @@
 *.DS_Store
 *.py[cod]
+*.html
+*.log
+webscrape/*
+/scraped_data/*

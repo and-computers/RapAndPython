@@ -27,7 +27,9 @@ logger.addHandler(fh)
 logger.addHandler(ch)
 
 """
-Known Issues: featured verses are counted same way
+Known Issues: 
+featured verses are counted same way
+R&B artists dont have as many words in their songs
 """
 
 
@@ -49,6 +51,7 @@ def make_reference_dict(artist_dir,regex):
 
 					yr = re.findall(r'\nALBUM INFO\r?\n\w{0,}?:\s".{0,}"\s\(\d+\)',alltxt)
 					try:
+						# take the last index in case the album name has numbers in it
 						yr = int(re.findall(r'\d+',yr[0])[-1])
 						if yr < 1900 or yr > 2020:
 							logger.warning('Year for {art}/{f} was {yr} replacing with NaN'.format(
@@ -180,6 +183,7 @@ homo_regex= r'f[a]*g\w{0,}'
 gay_regex = r'g[a]*y\w{0,}'
 bitch_regex = r'b[i]*tch\w{0,}|\sho[es]*\s'
 rape_regex = r'rap[ie]\w{0,}'
+nigga_regex = r'nigg[a]\w{0,}'
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=homo_regex)
 ref_df,ttc_homo_grouped_df = create_references_df(songs_number_ref)
@@ -187,61 +191,108 @@ simple_bar_from_df(
 	ttc_homo_grouped_df,
 	graph_title='Tyler The Creator and His Slurs Over The Years',
 	x_data='year',
-	y_data='number of references',
+	y_data='avg ref',
 	x_title='Year',
-	y_title='# of Homophobic References'
+	y_title='# of Homophobic References per Song'
 	)
 
 
 
 songs_number_ref = make_reference_dict('drake',regex=bitch_regex)
 ref_df,drake_grouped_df = create_references_df(songs_number_ref)
-simple_bar_from_df(
-	drake_grouped_df,
-	graph_title='Drakes Misogony: An Explorations',
-	x_data='year',
-	y_data='avg ref',
-	x_title='Year',
-	y_title='Average # of Bitch or Ho[e] References'
-	)
+# simple_bar_from_df(
+# 	drake_grouped_df,
+# 	graph_title='Drakes Misogony: An Explorations',
+# 	x_data='year',
+# 	y_data='avg ref',
+# 	x_title='Year',
+# 	y_title='Average # of Bitch or Ho[e] References'
+# 	)
 
 
 
 songs_number_ref = make_reference_dict('jcole',regex=bitch_regex)
 ref_df,cole_grouped_df = create_references_df(songs_number_ref)
-simple_bar_from_df(
-	cole_grouped_df,
-	graph_title='J. Cole\'s Misogony: An Explorations',
-	x_data='year',
-	y_data='avg ref',
-	x_title='Year',
-	y_title='Average # of Bitch or Ho[e] References'
-	)
+# simple_bar_from_df(
+# 	cole_grouped_df,
+# 	graph_title='J. Cole\'s Misogony: An Explorations',
+# 	x_data='year',
+# 	y_data='avg ref',
+# 	x_title='Year',
+# 	y_title='Average # of Bitch or Ho[e] References'
+# 	)
 
 songs_number_ref = make_reference_dict('tylerthecreator',regex=bitch_regex)
 ref_df,ttc_grouped_df = create_references_df(songs_number_ref)
-simple_bar_from_df(
-	ttc_grouped_df,
-	graph_title='Tyler\'s Misogony: An Explorations',
-	x_data='year',
-	y_data='avg ref',
-	x_title='Year',
-	y_title='Average # of Bitch or Ho[e] References'
-	)
+# simple_bar_from_df(
+# 	ttc_grouped_df,
+# 	graph_title='Tyler\'s Misogony: An Explorations',
+# 	x_data='year',
+# 	y_data='avg ref',
+# 	x_title='Year',
+# 	y_title='Average # of Bitch or Ho[e] References'
+# 	)
 
-comp_dfs = {}
-comp_dfs['Tyler The Creator'] = ttc_grouped_df
-comp_dfs['J. Cole'] = cole_grouped_df
-comp_dfs['Drake'] = drake_grouped_df
+# songs_number_ref = make_reference_dict('cardi-b',regex=bitch_regex)
+# ref_df,cardi_grouped_df = create_references_df(songs_number_ref)
 
-comparative_bar_from_df(
-	comp_dfs,
-	graph_title='Bitches & Hoes',
-	x_data='year',
-	y_data='avg ref',
-	x_title='Year',
-	y_title='Bitch/Hoe References per Song'
-	)
+# comp_dfs = {}
+# comp_dfs['Tyler The Creator'] = ttc_grouped_df
+# comp_dfs['J. Cole'] = cole_grouped_df
+# comp_dfs['Drake'] = drake_grouped_df
+# comp_dfs['Cardi B.'] = cardi_grouped_df
+
+# comparative_bar_from_df(
+# 	comp_dfs,
+# 	graph_title='Bitches & Hoes',
+# 	x_data='year',
+# 	y_data='avg ref',
+# 	x_title='Year',
+# 	y_title='Bitch/Hoe References per Song'
+# 	)
 
 
+# songs_number_ref = make_reference_dict('logic',regex=nigga_regex)
+# ref_df,logic_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('jcole',regex=nigga_regex)
+# ref_df,cole_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('kendricklamar',regex=nigga_regex)
+# ref_df,kdot_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('kehlani',regex=nigga_regex)
+# ref_df,kehlani_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('drake',regex=nigga_regex)
+# ref_df,drake_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('tylerthecreator',regex=nigga_regex)
+# ref_df,ttc_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('cardi-b',regex=nigga_regex)
+# ref_df,cardi_nig_grouped_df = create_references_df(songs_number_ref)
+
+# songs_number_ref = make_reference_dict('fatjoe',regex=nigga_regex)
+# ref_df,fatjoe_nig_grouped_df = create_references_df(songs_number_ref)
+
+# comp_nig_dfs = {}
+# comp_nig_dfs['Logic'] = logic_nig_grouped_df
+# comp_nig_dfs['J. Cole'] = cole_nig_grouped_df
+# comp_nig_dfs['Drake'] = drake_nig_grouped_df
+
+# comp_nig_dfs['Tyler The Creator'] = ttc_nig_grouped_df
+# comp_nig_dfs['Kehlani'] = kehlani_nig_grouped_df
+# comp_nig_dfs['Kendrick Lamar'] = kdot_nig_grouped_df
+# comp_nig_dfs['Cardi B.'] = cardi_nig_grouped_df
+# comp_nig_dfs['Fat Joe'] = fatjoe_nig_grouped_df
+
+# comparative_bar_from_df(
+# 	comp_nig_dfs,
+# 	graph_title='Nigga What Nigga Who',
+# 	x_data='year',
+# 	y_data='avg ref',
+# 	x_title='Year',
+# 	y_title='Nigga References per Song'
+# 	)
 
