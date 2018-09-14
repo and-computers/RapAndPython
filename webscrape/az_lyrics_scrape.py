@@ -33,89 +33,108 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-SLEEP_TIME = 19.0
-NOISE = (0.0,4.0)
+SLEEP_TIME = 17.212
+NOISE = (-8.438,10.173)
 
-url = "https://www.azlyrics.com/b/bigpun.html"
+# TODO: create from scrape_config.csv
 
 
 # act like a mac when requesting url
 headers = {'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) \
 AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.112 Safari/534.30"}
 
-# make a request for the data
-r = requests.get(url, headers=headers)
+for url in urls:
+	"""
+	sleep before request
+	you could check if the artists directory exists and skip first
+	but if a previous scrape session ended midway you wouldnt check for any missed songs
+	if the url lists gets too long you may get blocked just from the initial request to artist pages
+	"""
+	logger.info('Requesting songs from: {}'.format(url))
+	pre_request_sleep = SLEEP_TIME+random.uniform(NOISE[0],NOISE[1])
+	logger.info('Sleeping: {}'.format(pre_request_sleep))
+	time.sleep(pre_request_sleep)
+	# make a request for the data
+	r = requests.get(url, headers=headers)
 
-# convert the response text to soup
-soup = BeautifulSoup(r.text, "lxml")
+	# convert the response text to soup
+	soup = BeautifulSoup(r.text, "lxml")
 
-# get the songs and links to the lyrics
-lyrics_map = {}
-artists_file_directory = url.split('/')[-1].replace('.html','')
-for song_link in soup.find_all("a", href=True):
-	if len(song_link.text) == 0:
-		continue
-	lyrics_map[song_link.text] = song_link['href']
-	lyric_url = song_link['href']
-	if ".." in lyric_url:
-		lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
-
-		filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
-		filename += ".txt"
-		filename = os.path.join("scraped_data",artists_file_directory,filename)
-		filename = filename.encode('utf-8')
-
-		if os.path.exists(filename):
-			try:
-				logger.info('File {} already exists, skipping web request'.format(filename.encode('utf-8')))
-			except UnicodeEncodeError:
-				continue
+	# get the songs and links to the lyrics
+	lyrics_map = {}
+	artists_file_directory = url.split('/')[-1].replace('.html','')
+	for song_link in soup.find_all("a", href=True):
+		if len(song_link.text) == 0:
 			continue
-		logger.info('Requesting: {}'.format(lyric_url))
-		"""
-		sleep for some time (in seconds) so you arent banned from sites..
-		add some random noise to the sleep so it don't look like a robot
-		"""
-		time.sleep(SLEEP_TIME+random.uniform(NOISE[0],NOISE[1]))
-		response = requests.get(lyric_url, headers=headers)
-		new_soup = BeautifulSoup(response.text,"lxml")
+		lyrics_map[song_link.text] = song_link['href']
+		lyric_url = song_link['href']
+		if ".." in lyric_url:
+			lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
 
-		logger.info('Will Write to: {}'.format(filename))
-		
-		# https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
-		if not os.path.exists(os.path.dirname(filename)):
-			try:
-				os.makedirs(os.path.dirname(filename))
-			except OSError as exc: # Guard against race condition
-				if exc.errno != errno.EEXIST:
-					raise
+			filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
+			filename += ".txt"
+			filename = os.path.join("scraped_data",artists_file_directory,filename)
+			filename = filename.encode('utf-8')
 
-		f = open(filename,"w+")
-
-		# loop through the no clas divs. they contain the lyrics
-		for lyric in new_soup.find_all("div",{"class":None}):
-			try:
-				f = open(filename,"a")
-			except IOError:
-				logger.warning('IOError could not write filename: {}'.format(filename))
+			if os.path.exists(filename):
+				try:
+					logger.debug('File {} already exists, skipping web request'.format(filename.encode('utf-8')))
+				except:
+					continue
 				continue
 			try:
-				f.write(lyric.text.encode('utf-8'))
-			except UnicodeError:
-				logger.warning('UnicodeError, Skipping: {}'.format(filename))
-				f.close()
-				continue
+				logger.debug('Requesting: {}'.format(lyric_url))
+			except:
+				pass
+			"""
+			sleep for some time (in seconds) so you arent banned from sites..
+			add some random noise to the sleep so it don't look like a robot
+			"""
+			this_sleep = SLEEP_TIME+random.uniform(NOISE[0],NOISE[1])
+			logger.info('Sleeping: {}'.format(this_sleep))
+			time.sleep(this_sleep)
+			response = requests.get(lyric_url, headers=headers)
+			new_soup = BeautifulSoup(response.text,"lxml")
 
-		# the song panel div has the album name and the year
-		for song_panel_div in new_soup.find_all("div",{"class":"panel songlist-panel noprint"}):
 			try:
-				f.write('ALBUM INFO')
-				f.write(song_panel_div.text.encode('utf-8'))
-			except UnicodeError:
-				logger.warning('UnicodeError, Skipping')
-				f.close()
-				continue
+				logger.debug('Will Write to: {}'.format(filename))
+			except:
+				pass
+			
+			# https://stackoverflow.com/questions/12517451/automatically-creating-directories-with-file-output
+			if not os.path.exists(os.path.dirname(filename)):
+				try:
+					os.makedirs(os.path.dirname(filename))
+				except OSError as exc: # Guard against race condition
+					if exc.errno != errno.EEXIST:
+						raise
 
-		f.close()
+			f = open(filename,"w+")
+
+			# loop through the no clas divs. they contain the lyrics
+			for lyric in new_soup.find_all("div",{"class":None}):
+				try:
+					f = open(filename,"a")
+				except IOError:
+					logger.warning('IOError could not write filename: {}'.format(filename))
+					continue
+				try:
+					f.write(lyric.text.encode('utf-8'))
+				except UnicodeError:
+					logger.warning('UnicodeError, Skipping: {}'.format(filename))
+					f.close()
+					continue
+
+			# the song panel div has the album name and the year
+			for song_panel_div in new_soup.find_all("div",{"class":"panel songlist-panel noprint"}):
+				try:
+					f.write('ALBUM INFO')
+					f.write(song_panel_div.text.encode('utf-8'))
+				except UnicodeError:
+					logger.warning('UnicodeError, Skipping')
+					f.close()
+					continue
+
+			f.close()
 
 
