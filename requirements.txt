@@ -1,1 +1,4 @@
 textstat==0.4.1
+plotly
+pandas
+numpy
