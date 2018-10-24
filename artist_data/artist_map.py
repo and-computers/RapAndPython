@@ -1,13 +1,5 @@
-# TODO create this programatically from csv if at all
+#!/usr/bin/env python2
 
-meta = {'2pac': 
-			{'region':'West',
-			 'subregion': 'LA'
-			}
-		'absoul':
-			{'region':'West'}
-			{'subregion': 'LA'}
+import pandas as pd
 
-
-
-			}
+artist_df = pd.read_csv('artist_map.csv')
