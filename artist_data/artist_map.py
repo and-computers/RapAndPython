@@ -3,3 +3,4 @@
 import pandas as pd
 
 artist_df = pd.read_csv('artist_map.csv')
+artist_df.sum()
