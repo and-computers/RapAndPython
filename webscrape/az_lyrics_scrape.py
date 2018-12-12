@@ -13,6 +13,7 @@ import random
 
 # BeautifulSoupp is a library made to allow developers to parse through the contents of a webpage
 from bs4 import BeautifulSoup
+import pandas as pd
 
 
 
@@ -33,8 +34,9 @@ ch.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-SLEEP_TIME = 17.212
+SLEEP_TIME = 15.212
 NOISE = (-8.438,10.173)
+#NOISE = (0,5)
 
 # TODO: create from scrape_config.csv
 
@@ -43,7 +45,13 @@ NOISE = (-8.438,10.173)
 headers = {'User-Agent':"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) \
 AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.112 Safari/534.30"}
 
-for url in urls:
+scrape_config = os.path.join("webscrape","scrape_config.csv")
+
+df = pd.read_csv(scrape_config)
+
+artists_and_urls = zip(df.to_dict()['artist'].values(),df.to_dict()['url'].values())
+
+for artist_name,url in artists_and_urls:
 	"""
 	sleep before request
 	you could check if the artists directory exists and skip first
@@ -63,22 +71,29 @@ for url in urls:
 	# get the songs and links to the lyrics
 	lyrics_map = {}
 	artists_file_directory = url.split('/')[-1].replace('.html','')
+	artists_file_directory = artist_name
 	for song_link in soup.find_all("a", href=True):
 		if len(song_link.text) == 0:
 			continue
 		lyrics_map[song_link.text] = song_link['href']
 		lyric_url = song_link['href']
+
 		if ".." in lyric_url:
 			lyric_url = "https://www.azlyrics.com"+lyric_url[2:]
+			logger.info("Looking @ Lyrics for {}".format(lyric_url))
 
 			filename = song_link.text.replace(' ','_').replace("'",'').replace('/','')
 			filename += ".txt"
 			filename = os.path.join("scraped_data",artists_file_directory,filename)
 			filename = filename.encode('utf-8')
 
+			"""
+			a lot of the unspecified excepts are just to catch annoying character encoding bs
+			that comes with webscraping
+			"""
 			if os.path.exists(filename):
 				try:
-					logger.debug('File {} already exists, skipping web request'.format(filename.encode('utf-8')))
+					logger.info('File {} already exists, skipping web request'.format(filename.encode('utf-8')))
 				except:
 					continue
 				continue
