@@ -6,6 +6,7 @@ and music and albums and lyrics easier to do for analysis
 import logging
 import os
 import re
+import itertools
 
 logger = logging.getLogger('lyrics_analysis.{}'.format(__name__))
 logger.setLevel(logging.DEBUG)
@@ -22,12 +23,17 @@ class Album(object):
 	"""
 	An object to hold album data and metadata
 	"""
-	def __init__(self,song_objects):
-		self.name = song_objects[0].album_name
-		self.year = song_objects[0].year
-		self.artist = song_objects[0].artist
+	def __init__(self,song_objects,album_name=None):
+		if album_name:
+			self.name = album_name
+		else:
+			self.name = song_objects[0].album_name
+		self.year = song_objects[0].album_year
 		self.num_songs = len(song_objects)
-		self.features = [x.features for x in song_objects]
+		list_of_lists_features = [x.features for x in song_objects]
+		# compress list of lists into one single list
+		self.features = set(list(itertools.chain.from_iterable(list_of_lists_features)))
+
 
 class Song(object):
 	"""
@@ -37,8 +43,9 @@ class Song(object):
 	def __init__(self,lyric_file_txt,fname):
 
 		self.song_name = fname.split(os.sep)[-1].replace('_',' ').replace('.txt','')
-		self.lyrics,self.album_info = self.separate_lyrics(lyric_file_txt)
+		self.lyrics,self.album_info = self._separate_lyrics(lyric_file_txt)
 		self.album_name, self.album_year = self.find_album_info()
+		self.features = self._find_features()
 
 	def __repr__(self):
 		return 'Song:{s},Album: {aname} ({yr})'.format(
@@ -48,7 +55,10 @@ class Song(object):
 			)
 
 
-	def separate_lyrics(self,lyrics_txt):
+	def _separate_lyrics(self,lyrics_txt):
+		"""
+		seperate lyrics from the album information
+		"""
 		try:
 			idx_of_album_info = lyrics_txt.index('ALBUM INFO\r\n')
 
@@ -61,6 +71,12 @@ class Song(object):
 		return only_lyrics,album_info
 
 	def find_album_info(self):
+		"""
+		Determine informationa bout the album
+		specifically the name and year of release
+
+		If the data is not included in the song text, set them both as None
+		"""
 
 		if self.album_info:
 
@@ -87,6 +103,51 @@ class Song(object):
 
 		else:
 			return None,None
+
+	def _find_features(self):
+		"""
+		Find all the featured artists in the song
+		most of the times the lyrics are entered with each verse
+		having a name before it like this
+
+		[Jay-Z:]
+		lyrics lyrics lyrics lyrics
+		[Nas:]
+		lyrics lyrics lyrics lyrics
+
+		But also need some logic for getting of rid things like this
+
+		[Intro]
+		TAY KEEIITHHHHHH FFF THHEESEESE NINJAAS UPP1!!
+		[Verse 1]
+		yadda yadda yadda
+		[Verse 2]
+		yadda yadda yadda [x2]
+		[Hook]
+		singy songy sing song [x6]
+		[Verse 3]
+		bars bars bars
+		[Outro]
+		*jadakiss laugh*
+		"""
+
+		# first find things in between brackets
+		things_in_brackets = set(re.findall(r"[^[]*\[([^]]*)\]",''.join(self.lyrics)))
+		feature_names = []
+		for fname in things_in_brackets:
+
+			#get rid of Verse/Hook qualifiers
+			fname = re.sub(r'(Verse|Hook|Bridge|chorus|interlude)[:*\s|x]*\d','',fname)
+			# # remove leading dashes after breaking down feature
+			# fname = re.sub(r'^-','',fname)
+			fname = fname.lower().replace(":","").replace("intro","").replace("verse","").replace("interlude","").replace("hook","").replace("chorus","").replace("outro","").strip()
+			# remove leading dashes again if they appear after this breakdown
+			fname = re.sub(r'^-','',fname)
+			# sometimes its unknown and filled in with question mark sometimes its repeated phrases like "x2"
+			if fname and not fname=="?" and not re.findall(r'x\d',fname):
+				feature_names.append(fname.strip())
+
+		return feature_names
 
 
 
