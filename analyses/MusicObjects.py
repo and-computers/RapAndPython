@@ -33,6 +33,19 @@ class Album(object):
 		list_of_lists_features = [x.features for x in song_objects]
 		# compress list of lists into one single list
 		self.features = set(list(itertools.chain.from_iterable(list_of_lists_features)))
+		self.song_objects = song_objects
+
+	def __repr__(self):
+		return 'Album: {aname} ({yr})'.format(aname=self.name,yr=self.year)
+
+
+	def find_references(self,regex):
+		allrefs = []
+		for song in self.song_objects:
+			refs = song.find_references(regex=regex)
+			allrefs += refs
+
+		return allrefs
 
 
 class Song(object):
@@ -43,8 +56,9 @@ class Song(object):
 	def __init__(self,lyric_file_txt,fname):
 
 		self.song_name = fname.split(os.sep)[-1].replace('_',' ').replace('.txt','')
+
 		self.lyrics,self.album_info = self._separate_lyrics(lyric_file_txt)
-		self.album_name, self.album_year = self.find_album_info()
+		self.album_name, self.album_year = self._find_album_info()
 		self.features = self._find_features()
 
 	def __repr__(self):
@@ -54,15 +68,31 @@ class Song(object):
 			yr=self.album_year
 			)
 
+	def find_references(self,regex):
+		"""
+		Find references in lyrics that match a certain regex formula
+
+		:param regex: regular expression to match within lyrics
+		:regex type: str
+
+		:returns: list of the references that match regex
+		:rtype: list
+		"""
+		all_lyrics = ''.join(self.lyrics)
+		found_refs = re.findall(regex,all_lyrics)
+		return found_refs
+
 
 	def _separate_lyrics(self,lyrics_txt):
 		"""
 		seperate lyrics from the album information
 		"""
 		try:
-			idx_of_album_info = lyrics_txt.index('ALBUM INFO\r\n')
+			#idx_of_album_info = lyrics_txt.index('ALBUM INFO\r\n')
 
-		except ValueError:
+			idx_of_album_info = [i for i,item in enumerate(lyrics_txt) if re.search(r'ALBUM INFO\s',item)][0]
+
+		except (ValueError,IndexError):
 			idx_of_album_info = len(lyrics_txt)
 
 		only_lyrics = lyrics_txt[:idx_of_album_info]
@@ -70,7 +100,7 @@ class Song(object):
 
 		return only_lyrics,album_info
 
-	def find_album_info(self):
+	def _find_album_info(self):
 		"""
 		Determine informationa bout the album
 		specifically the name and year of release
@@ -136,16 +166,24 @@ class Song(object):
 		feature_names = []
 		for fname in things_in_brackets:
 
-			#get rid of Verse/Hook qualifiers
-			fname = re.sub(r'(Verse|Hook|Bridge|chorus|interlude)[:*\s|x]*\d','',fname)
+			#get rid of Verse/Hook/Bridge etc. qualifiers
+			fname = re.sub(r'(verse|hook|bridge|chorus|interlude|inaudible|ad-libs|sample)([:*\s|x|-]*\d)*','',fname.lower())
 			# # remove leading dashes after breaking down feature
 			# fname = re.sub(r'^-','',fname)
 			fname = fname.lower().replace(":","").replace("intro","").replace("verse","").replace("interlude","").replace("hook","").replace("chorus","").replace("outro","").strip()
 			# remove leading dashes again if they appear after this breakdown
 			fname = re.sub(r'^-','',fname)
-			# sometimes its unknown and filled in with question mark sometimes its repeated phrases like "x2"
-			if fname and not fname=="?" and not re.findall(r'x\d',fname):
-				feature_names.append(fname.strip())
+			
+
+			# also split up things that are like meek mill & desiigner or meek mill (designer)
+			fname = fname.replace("(","&").replace(")","").replace("and","&")
+			fnames = fname.split("&")
+
+
+			for split_name in fnames:
+				# sometimes its unknown and filled in with question mark sometimes its repeated phrases like "x2"
+				if split_name and not split_name=="?" and not re.findall(r'x\d',split_name):
+					feature_names.append(split_name.strip())
 
 		return feature_names
 
