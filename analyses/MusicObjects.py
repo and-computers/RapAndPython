@@ -47,6 +47,14 @@ class Album(object):
 
 		return allrefs
 
+	def aggregate_artist_verses_on_album(self,artist_regex):
+		all_lines = []
+		for song in self.song_objects:
+			verse_lines = song.aggregate_artist_verses(artist_regex)
+			all_lines += verse_lines
+
+		return all_lines
+
 
 class Song(object):
 	"""
@@ -67,6 +75,91 @@ class Song(object):
 			aname=self.album_name,
 			yr=self.album_year
 			)
+
+	def _find_things_in_brackets(self):
+		"""
+		Given a string of text return all of the strings that
+		occur between brackets. the use case for this is finding
+		feautres and song attributes like hook vs bridge vs whatever
+		"""
+		songtxt = ''.join(self.lyrics)
+		things_in_brackets = set(re.findall(r"[^[]*\[([^]]*)\]",songtxt))
+		return things_in_brackets
+
+	def find_artist_verse_index_pairs(self,artist_regex,case_insensitive=True):
+		"""
+		Find all the pairs of indices that enclose
+		aritsts verses, this is used to 
+		separate artists lyrics from the lyrics
+		of the songs features
+		"""
+
+		artist_regex = artist_regex.lower()
+
+		lyric_str = ''.join(self.lyrics)
+
+		idx_pairs = []
+
+		start_idx = None
+		end_idx = None
+
+
+		# if there are no brackets, assume no features
+		# and assume that all the lyrics belong to the artist
+		things_in_brackets = self._find_things_in_brackets()
+		if not things_in_brackets:
+			return [(0,len(self.lyrics))]
+		else:
+			for i in range(len(self.lyrics)):
+				curr_line = self.lyrics[i]
+
+				curr_line = curr_line.lower()
+
+				artist_match = re.search(artist_regex,curr_line)
+				# for each line check if it is one of the bracket containing ones
+				for potential_artist in things_in_brackets:
+
+					if potential_artist.lower() in curr_line.lower():
+
+						# if the line has a bracket artist in it, check if its the artist of interest
+						artist_match = re.search(artist_regex,curr_line)
+						if artist_match:
+							# store start index
+							start_idx = i
+							# reset end index
+							end_idx = None
+						else:
+							# store end index
+							end_idx = i
+				# also create end index if the song is over
+				if i == len(self.lyrics) - 1:
+					end_idx = i
+
+
+				if start_idx and end_idx:
+					idx_pairs.append((start_idx,end_idx))
+					start_idx = None
+					end_idx = None
+
+		return idx_pairs
+
+
+	def aggregate_artist_verses(self,artist_regex):
+		"""
+		Return a list of all the lines that are by the artist who matches regex expression
+		exclude verses from features and/or hooks if possible
+		"""
+		verse_lines = []
+		artist_verse_index_pairs = self.find_artist_verse_index_pairs(artist_regex)
+		for i in range(len(self.lyrics)):
+			curr_line = self.lyrics[i]
+
+			for verse_idx_pair in artist_verse_index_pairs:
+				if i > verse_idx_pair[0] and i < verse_idx_pair[1]:
+					verse_lines.append(curr_line)
+
+		return verse_lines
+			
 
 	def find_references(self,regex):
 		"""
@@ -162,7 +255,8 @@ class Song(object):
 		"""
 
 		# first find things in between brackets
-		things_in_brackets = set(re.findall(r"[^[]*\[([^]]*)\]",''.join(self.lyrics)))
+		#things_in_brackets = set(re.findall(r"[^[]*\[([^]]*)\]",''.join(self.lyrics)))
+		things_in_brackets = self._find_things_in_brackets()
 		feature_names = []
 		for fname in things_in_brackets:
 
