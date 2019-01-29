@@ -3,5 +3,5 @@
 *.html
 *.log
 webscrape/*
-spotify_api/creds.txt
+**creds*.txt
 /scraped_data/*
