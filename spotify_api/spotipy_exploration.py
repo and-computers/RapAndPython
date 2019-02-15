@@ -10,7 +10,7 @@ with open('spotify_api/creds.txt') as f_h:
 sp = spotipy.Spotify(
     auth=creds)
 
-results = sp.search(q='soulja boy', limit=10)
+results = sp.search(q='soulja boy', limit=50)
 
 colnames = ['song_name', 'id', 'duration_ms', 'time_signature', 'danceability',
             'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
