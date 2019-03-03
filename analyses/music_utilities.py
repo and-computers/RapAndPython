@@ -3,7 +3,17 @@
 some utilities for using MusicObjects
 """
 import os
+import pandas as pd
 from MusicObjects import Song, Album, Artist
+
+
+def get_artist_metadata():
+    toplevel = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DIRNAME = 'artist_data'
+    path = os.path.join(toplevel, DIRNAME, 'artist_map.csv')
+    artist_meta_data_df = pd.read_csv(path)
+
+    return artist_meta_data_df
 
 
 def list_all_artists():
