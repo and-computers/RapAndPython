@@ -91,6 +91,14 @@ class Song(object):
             yr=self.album_year
         )
 
+    @property
+    def album_name(self):
+        return self._album_name
+
+    @album_name.setter
+    def album_name(self, albumname):
+        self._album_name = albumname
+
     def _find_things_in_brackets(self):
         """
         Given a string of text return all of the strings that
@@ -289,11 +297,3 @@ class Song(object):
                     feature_names.append(split_name.strip())
 
         return feature_names
-
-    @property
-    def album_name(self):
-        return self._album_name
-
-    @album_name.setter
-    def album_name(self, albumname):
-        self._album_name = albumname
