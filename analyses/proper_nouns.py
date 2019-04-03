@@ -13,6 +13,7 @@ from nltk.tokenize import word_tokenize
 from music_utilities import initialize_data_objects, extract_songs_from_albums, make_reference_dictionary
 from music_utilities import create_comparative_dict_from_artist_list, list_all_artists, get_artist_metadata
 
+# all the words that come up so often and misproperly tagged as proper nouns, we are going to manually filter
 non_nnp_filter = ['got', 'nigga', 'hook', 'verse', 'chorus', 'intro', 'outro', 'gettin',
                   'niggas', 'niggaz', 'verse', 'fuck', 'got', 'young',
                   'cause', 'shit', 'yea', 'shawty', 'bitch', 'money', 'homie',
@@ -25,8 +26,12 @@ non_nnp_filter = ['got', 'nigga', 'hook', 'verse', 'chorus', 'intro', 'outro', '
                   'them', 'i\xc3\xa2\xc2\x80\xc2\x99m', 'grind', 'y', 'ugh', 'da', 'said',
                   'i\xc3\xa2\xc2\x80\xc2\x99ma', 'my', 'me', 'ca', 'fly', 'fuckin', 'dj',
                   'dey', 'pull', 'know', 'lot', 'woo', 'uhh', 'ha', 'be', 'im', 'ma', 'bitches'
-                  ]
+                  'shorty', 'please', 'puff', 'okay', 'nah', 'x2', 'go', 'jigga', 'street', 'jesus',
+                  'go', 'are', 'boy', 'new', 'are', 'okay', 'ok', 'mama', 'come', 'com', 'new', 'huh',
+                  'get', 'mama', 'aye', 'gang']
+# the part of speech tag for proper nouns
 NNP = 'NNP'
+# the regions that each artist are categorized into
 REGIONS = ['West', 'Midwest', 'East', 'South']
 
 
@@ -61,7 +66,7 @@ def process_artists_nnp_counts(artists=None, load_file=None, save_file=False, sa
                                     count_my_shit[w] += 1
                                 elif w not in count_my_shit.keys():
                                     count_my_shit[w] = 1
-                except UnicodeDecodeError as e:
+                except UnicodeDecodeError:
                     continue
 
     sorted_counts = sorted(count_my_shit.items(), key=operator.itemgetter(1))
@@ -75,6 +80,9 @@ def process_artists_nnp_counts(artists=None, load_file=None, save_file=False, sa
 
     return sorted_counts
 
+
+# import pdb
+# pdb.set_trace()
 all_artists = list_all_artists()
 
 artist_df = get_artist_metadata()
@@ -83,6 +91,7 @@ artist_df = get_artist_metadata()
 for region in REGIONS:
     region_rows = artist_df[artist_df['region'] == region]
     region_artists = list(region_rows.artist)
-    all_counts = process_artists_nnp_counts(artists=region_artists, save_file=True, save_fname=region)
+    all_counts = process_artists_nnp_counts(
+        artists=region_artists, load_file='South_counts_1551602137.pickle', save_file=True, save_fname=region)
     print(region)
     print(all_counts)
