@@ -65,7 +65,7 @@ def initialize_data_objects(artistname):
                 album_dict[album_name] = [song]
 
     album_objects = []
-    for album_name, song_list in album_dict.iteritems():
+    for album_name, song_list in album_dict.items():
         new_album = Album(song_list)
         album_objects.append(new_album)
 
