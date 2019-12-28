@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import pdb
 import csv
 import spotipy
@@ -99,8 +102,8 @@ def main():
     USERNAME = 'omo_desol'
 
     playlist_information = read_playlist(spotify=SP, username=USERNAME, playlist_id=PLAYLIST_ID)
-    playlist_information['items'][0]['track']['id']
-    tracks, artists = create_spotify_objects(playlist_information)
+    # playlist_information['items'][0]['track']['id']
+    # tracks, artists = create_spotify_objects(playlist_information)
     import pdb
     pdb.set_trace()
 
