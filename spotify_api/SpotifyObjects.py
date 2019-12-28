@@ -72,6 +72,8 @@ class SpotifyTrack():
         take the raw dictionary and
         create attributes for easy access
         """
+        # import pdb
+        # pdb.set_trace()
 
         self.album = SpotifyAlbum(raw_dict['album'])
         self.release_date = self.album.release_date
@@ -114,13 +116,25 @@ class SpotifyAlbum():
     """
 
     def __init__(self, raw_dict: dict):
+        self.id = None
+        self.release_date = None
+        self.name = None
+        self.artists = []
+        self.href = None
         self._process_raw(raw_dict)
 
-    def _process_raw(self):
+    def _process_raw(self, raw_dict=dict) -> None:
         """
         take the raw dictionary and
         create attributes for easy access
         """
+        self.id = raw_dict['id']
+        self.release_date = raw_dict['release_date']
+        self.name = raw_dict['name']
+        self.href = raw_dict['href']
+        for artist_dict in raw_dict['artists']:
+            artist = SpotifyArtist(artist_dict)
+            self.artists.append(artist)
 
 
 class SpotifyArtist():
@@ -129,10 +143,16 @@ class SpotifyArtist():
     """
 
     def __init__(self, raw_dict: dict):
+        self.id = None
+        self.name = None
+        self.href = None
         self._process_raw(raw_dict)
 
-    def _process_raw(self):
+    def _process_raw(self, raw_dict: dict) -> None:
         """
         take the raw dictionary and
         create attributes for easy access
         """
+        self.id = raw_dict['id']
+        self.name = raw_dict['name']
+        self.href = raw_dict['href']

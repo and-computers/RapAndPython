@@ -3,10 +3,10 @@
 
 import pdb
 import csv
+from typing import List
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-# import pandas as pd
-
+import SpotifyObjects
 
 AUDIO_FEATURE_COLS = ['song_name', 'id', 'duration_ms', 'time_signature', 'danceability',
                       'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
@@ -91,6 +91,20 @@ def write_data(spotify, track_results, fname='spotify_api/audio_data/yada.csv'):
             datawriter.writerow(x)
 
 
+def create_spotify_objects(track_information: dict) -> List[SpotifyObjects.SpotifyTrack]:
+    """
+    take dictionaries of tracks from spotify api
+    and create spotify objects for albums, tracks, and artists
+    """
+    tracks = []
+    for playlist_entry in track_information:
+        track_dict = playlist_entry['track']
+        track = SpotifyObjects.SpotifyTrack(track_dict)
+        tracks.append(track)
+
+    return tracks
+
+
 def main():
     """
     run the functions
@@ -101,9 +115,9 @@ def main():
     PLAYLIST_ID = '0eCUnMZEBIlbR5tHTdnJN3'
     USERNAME = 'omo_desol'
 
-    playlist_information = read_playlist(spotify=SP, username=USERNAME, playlist_id=PLAYLIST_ID)
+    playlist_track_information = read_playlist(spotify=SP, username=USERNAME, playlist_id=PLAYLIST_ID)
     # playlist_information['items'][0]['track']['id']
-    # tracks, artists = create_spotify_objects(playlist_information)
+    tracks = create_spotify_objects(playlist_track_information)
     import pdb
     pdb.set_trace()
 
