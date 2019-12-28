@@ -4,6 +4,10 @@
 spotify objects for easy access to api result data
 """
 
+from typing import List
+
+from spotipy import Spotify
+
 """
 {
 'album': {'album_type': 'album', 'artists': [{'external_urls': {'spotify': 'https://open.spotify.com/artist/3nFkdlSjzX9mRTtwJOzDYB'}, 'href': 'https://api.spotify.com/v1/artists/3nFkdlSjzX9mRTtwJOzDYB', 'id': '3nFkdlSjzX9mRTtwJOzDYB', 'name': 'JAY-Z', 'type': 'artist', 'uri': 'spotify:artist:3nFkdlSjzX9mRTtwJOzDYB'}, {'external_urls': {'spotify': 'https://open.spotify.com/artist/5K4W6rqBFWDnAN6FQUkS6x'}, 'href': 'https://api.spotify.com/v1/artists/5K4W6rqBFWDnAN6FQUkS6x','id': '5K4W6rqBFWDnAN6FQUkS6x', 'name': 'Kanye West', 'type': 'artist', 'uri': 'spotify:artist:5K4W6rqBFWDnAN6FQUkS6x'}]
@@ -59,15 +63,18 @@ class SpotifyTrack():
         self.popularity = None
         self.href = None
         self.artists = []
+        self.audio_features = None
+        self.release_date = None
         self._process_raw(raw_dict)
 
-    def _process_raw(self, raw_dict):
+    def _process_raw(self, raw_dict: dict) -> None:
         """
         take the raw dictionary and
         create attributes for easy access
         """
 
         self.album = SpotifyAlbum(raw_dict['album'])
+        self.release_date = self.album.release_date
         self.id = raw_dict['id']
         self.duration = raw_dict['duration_ms']
         self.name = raw_dict['name']
@@ -78,6 +85,27 @@ class SpotifyTrack():
         for artist_dict in raw_dict['artists']:
             artist = SpotifyArtist(artist_dict)
             self.artists.append(artist)
+
+    def retrieve_audio_features(self, spotify: Spotify, features: List[str]) -> dict:
+        """
+        call spotify api and retrieve audio features
+        """
+
+        audio_features = spotify.audio_features(self.id)[0]
+
+        rowdict = {'release_date': self.release_date, 'song_name': self.name}
+        audio_features_dict = {}
+        for col in features:
+            try:
+                rowdict[col] = audio_features[col]
+                audio_features_dict[col] = audio_features[col]
+            except KeyError as ke:
+                print(f'Could not find {col} in returned audio features for {self.name}')
+                continue
+
+        self.audio_features = audio_features_dict
+
+        return audio_features_dict
 
 
 class SpotifyAlbum():
