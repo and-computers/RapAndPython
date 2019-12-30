@@ -3,6 +3,8 @@
 
 import pdb
 import csv
+from datetime import datetime, timedelta
+from dateutil import parser
 import pickle
 from typing import Any, List
 import spotipy
@@ -131,6 +133,70 @@ def create_spotify_objects(track_information: dict, with_audio_features: bool,
     return tracks
 
 
+def trend_audio_features(tracks):
+    """
+    trend audio features of track obejcts over time
+    """
+    songs_dicts = []
+    start_time = datetime(year=2019, month=12, day=7, hour=20, minute=50)
+
+    time_plus = timedelta(minutes=0)
+
+    for track in tracks:
+
+        track_id = track.id
+        popularity = track.popularity
+        name = track.name
+        release_date = track.release_date
+        duration_ms = track.duration
+        # cols that need additional processing
+        rowdict = {
+            'release_date': release_date,
+            'song_name': name,
+            'id': track_id,
+            'popularity': popularity,
+            'length_minutes': duration_ms / 60000}
+        artists = track.artists
+        time_plus += timedelta(minutes=duration_ms / 60000)
+        song_end_time = start_time + time_plus
+        rowdict['time'] = f"{song_end_time.hour}:{song_end_time.minute}"
+
+        artist_names = [x.name for x in artists]
+        artists_str = ",".join(artist_names)
+        rowdict['artists'] = artists_str
+        audio_features = track.audio_features
+
+        AUDIO_FEATURES_TO_WRITE = ['tempo', 'energy', 'valence', 'danceability']
+
+        for col in AUDIO_FEATURES_TO_WRITE:
+            try:
+                rowdict[col] = audio_features[col]
+            except KeyError as ke:
+                continue
+
+        songs_dicts.append(rowdict)
+
+    fname = 'spotify_api/article-127-kickback-king/graphable-data.csv'
+    DATA_COLS = [
+        'song_name',
+        'id',
+        'time',
+        'artists',
+        'release_date',
+        'length_minutes',
+        'popularity',
+        'danceability',
+        'energy',
+        'valence',
+        'tempo']
+
+    with open(fname, 'w+') as f_h:
+        datawriter = csv.DictWriter(f_h, fieldnames=DATA_COLS)
+        datawriter.writeheader()
+        for x in songs_dicts:
+            datawriter.writerow(x)
+
+
 def main():
     """
     run the functions
@@ -147,8 +213,8 @@ def main():
     # tracks = create_spotify_objects(track_information=playlist_track_information, with_audio_features=True, spotify=SP)
     # save_to_pickle(tracks, TRACK_OBJS_FILE)
     tracks = load_from_pickle(TRACK_OBJS_FILE)
-    import pdb
-    pdb.set_trace()
+    trend_audio_features(tracks)
+
 
 if __name__ == "__main__":
     main()
