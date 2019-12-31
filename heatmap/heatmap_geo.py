@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-classes for handling data to arrange slotting inputs & outputs
+script for creating heatmap of artists geography
 """
 from gmplot import gmplot
 
