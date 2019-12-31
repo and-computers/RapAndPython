@@ -5,4 +5,5 @@
 webscrape/*
 /scraped_data/*
 spotify_api/creds/*
+**creds.txt
 
