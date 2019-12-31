@@ -9,36 +9,38 @@ US_CENTER_LAT = 39.8283
 US_CENTER_LNG = -98.5795
 HTMLFILE = '127-heatmap.html'
 
-LosAngeles = (34.0522, -118.2437)
-NewYork = (40.7128, -74.006)
-Chicago = (41.8781, -87.6298)
-Oakland = (37.8044, -122.2712)
-Atlanta = (33.7490, -84.3880)
-WashDC = (38.9072, -77.0369)
-Miami = (25.7617, -80.1918)
-Charlotte = (35.2271, -80.8431)
-Toronto = (43.6532, -79.3832)
-Philadelphia = (39.9526, -75.1652)
-STL = (38.627, -90.1994)
-Memphis = (35.1495, -90.0490)
-Houston = (29.7604, -95.3698)
-Tappahannock = (37.9244, -76.8591)
-SanMarcos = (29.883, -97.9414)
-Tallahassee = (30.4383, -84.2807)
-London = (51.5074, 0.1278)
-Jamaica = (18.1096, -77.2975)
-Lagos = (6.5244, 3.3792)
-MobileAlabama = (30.6954, -88.0399)
-Oshawa = (43.8971, -78.8658)
-Portland = (45.5051, -122.6750)
-Clearwater = (27.9659, -82.8001)
-PompanoBeach = (26.2379, -80.1248)
-Detroit = (42.3314, -83.0458)
-Tupelo = (34.2576, -88.7034)
-Nola = (29.9511, -90.0715)
-Louisville = (38.2527, -85.7585)
-Grapevine = (32.9343, -97.0781)
-Petersburg = (37.2279, -77.4019)
+# TODO: replace w/ geocodes
+# lat, lng = mymap.geocode("Stanford University")
+LosAngeles = (34.0522, -118.2437, "West Coast")
+NewYork = (40.7128, -74.006, "East Coast")
+Chicago = (41.8781, -87.6298, "Midwest")
+Oakland = (37.8044, -122.2712, "West Coast")
+Atlanta = (33.7490, -84.3880, "Southern")
+WashDC = (38.9072, -77.0369, "East Coast")
+Miami = (25.7617, -80.1918, "Southern")
+Charlotte = (35.2271, -80.8431, "Southern")
+Toronto = (43.6532, -79.3832, "Canada")
+Philadelphia = (39.9526, -75.1652, "East Coast")
+STL = (38.627, -90.1994, "Southern")
+Memphis = (35.1495, -90.0490, "Southern")
+Houston = (29.7604, -95.3698, "Southern")
+Tappahannock = (37.9244, -76.8591, "Southern")
+SanMarcos = (29.883, -97.9414, "Southern")
+Tallahassee = (30.4383, -84.2807, "Southern")
+London = (51.5074, 0.1278, "UK")
+Jamaica = (18.1096, -77.2975, "Caribbean")
+Lagos = (6.5244, 3.3792, "West Africa")
+MobileAlabama = (30.6954, -88.0399, "Southern")
+Oshawa = (43.8971, -78.8658, "Canada")
+Portland = (45.5051, -122.6750, "West Coast")
+Clearwater = (27.9659, -82.8001, "Southern")  # FL
+PompanoBeach = (26.2379, -80.1248, "Southern")  # FL
+Detroit = (42.3314, -83.0458, "Midwest")
+Tupelo = (34.2576, -88.7034, "Southern")  # MS
+Nola = (29.9511, -90.0715, "Southern")
+Louisville = (38.2527, -85.7585, "Southern")
+Grapevine = (32.9343, -97.0781, "Southern")  # TX
+Petersburg = (37.2279, -77.4019, "Southern")  # VA
 
 artist_locale = {
     'H.E.R.':
@@ -259,18 +261,41 @@ artist_locale = {
 }
 
 
+def get_google_map_creds(fname='heatmap/gmaps-creds.txt'):
+    """
+    get google maps credentials for api access
+    """
+
+    with open(fname) as f_h:
+        creds = f_h.read()
+    return creds
+
+
 def main():
-    plotter = gmplot.GoogleMapPlotter(center_lat=US_CENTER_LAT, center_lng=US_CENTER_LNG, zoom=6)
+    plotter = gmplot.GoogleMapPlotter(
+        center_lat=US_CENTER_LAT,
+        center_lng=US_CENTER_LNG,
+        zoom=1,
+        apikey=get_google_map_creds())
 
     lats = []
     lngs = []
+
+    counts = {}
 
     for artist, coords in artist_locale.items():
 
         lats.append(coords[0])
         lngs.append(coords[1])
 
+        if coords[2] in counts:
+            counts[coords[2]] += 1
+        else:
+            counts[coords[2]] = 1
+
     plotter.heatmap(lats=lats, lngs=lngs)
+
+    print(counts)
 
     plotter.draw(HTMLFILE)
 
